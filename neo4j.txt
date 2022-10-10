@@ -1,0 +1,15 @@
+match (n) detach delete n
+
+load csv with headers from 'file:///geo.csv' as line
+create (e:PC {PC: line.PostalCode, country: line.Country, city: line.City, state: line.State, region: line.Region})
+
+load csv with headers from 'file:///customers.csv' as line
+create (c:Customer {customerid: line.CustomerId, name: line.CustomerName, segment: line.Segment})
+
+load csv with headers from 'file:///products.csv' as line
+create (p:Product {productid: line.ProductID, category: line.Category, subcategory: line.SubCategory, name: line.ProductName})
+
+load csv with headers from 'file:///Rels.csv' as line
+match (e:PC {PC: line.PostalCode}),(p:Product {productid: line.ProductID}),(c:Customer {customerid: line.CustomerID})
+create (c)-[:BUYS {sales:toInteger(line.Sales), quantity: toInteger(line.Quantity)}]->(p)
+create (c)-[:LIVES_IN]->(e)
